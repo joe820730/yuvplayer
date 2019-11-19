@@ -188,8 +188,9 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&WVGA   (832x480)",           ID_SIZE_WVGA
         MENUITEM "WQVGA (416x240)",             ID_SIZE_WQVGA
+        MENUITEM "640x360 (640x360)",           ID_SIZE_640X360, CHECKED
         MENUITEM SEPARATOR
-        MENUITEM "&CIF      (352x288)",         ID_SIZE_CIF, CHECKED
+        MENUITEM "&CIF      (352x288)",         ID_SIZE_CIF
         MENUITEM "&QCIF    (176x144)",          ID_SIZE_QCIF
         MENUITEM "SMALL (192x256)",             ID_SIZE_192X256
         MENUITEM SEPARATOR

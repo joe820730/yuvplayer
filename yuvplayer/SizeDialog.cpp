@@ -42,8 +42,8 @@ IMPLEMENT_DYNAMIC(CSizeDialog, CDialog)
 
 CSizeDialog::CSizeDialog(CWnd* pParent /*=NULL*/)
 	: CDialog(CSizeDialog::IDD, pParent)
-	, width(4096)
-	, height(2048)
+	, width(640)
+	, height(360)
 {
 
 }

@@ -75,6 +75,7 @@ static const size_info_t size_info[] = {
 	{ L"vga", 640, 480, ID_SIZE_VGA },
 	{ L"qcif", 176, 144, ID_SIZE_QCIF },
 	{ L"cif", 352, 288, ID_SIZE_CIF },
+	{ L"640x360", 640, 360, ID_SIZE_640X360 },
 
 	// end delimiter
 	{ NULL, 0, 0, 0 }
@@ -104,6 +105,7 @@ static const size_info_t size_info[] = {
 	{ L"cif", 352, 288, ID_SIZE_CIF },
 
 	{ L"192x256", 192, 256, ID_SIZE_192X256 },
+	{ L"640x360", 640, 360, ID_SIZE_640X360 },
 
 	{ L"3840x2160", 3840, 2160, ID_SIZE_CUSTOM },
 	{ L"1920x1088", 1920, 1088, ID_SIZE_CUSTOM },
@@ -280,7 +282,7 @@ void CyuvplayerDlg::Resize(int width, int height)
 	y = new unsigned char[width*height*2];
 	u = new unsigned char[width*height*2];
 	v = new unsigned char[width*height*2];
-	
+
 	rgba    = new unsigned char[t_width*t_height*4];
 	segment = new unsigned char[t_width*t_height*4];
 	
@@ -400,6 +402,11 @@ void CyuvplayerDlg::OnSizeChange(UINT nID )
         case ID_SIZE_192X256:
 			menu->CheckMenuItem( ID_SIZE_192X256,	MF_CHECKED);
 			Resize( 192, 256 );
+			return;
+
+		case ID_SIZE_640X360:
+			menu->CheckMenuItem(ID_SIZE_640X360, MF_CHECKED);
+			Resize(640, 360);
 			return;
 
 	}
