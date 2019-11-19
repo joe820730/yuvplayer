@@ -1101,6 +1101,8 @@ void CyuvplayerDlg::OnDestroy()
 	
 	if( rgba != NULL ) delete rgba;
 	if( misc != NULL ) delete misc;
+	if ( filename != NULL ) delete filename;
+	if ( segment != NULL ) delete segment;
 
 	if( fd > -1 ) _close(fd);
 }
