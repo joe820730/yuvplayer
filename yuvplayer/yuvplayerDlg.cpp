@@ -695,6 +695,14 @@ void CyuvplayerDlg::LoadFrame(void)
 }
 
 #define clip(var) ((var>=255)?255:(var<=0)?0:var)
+
+#define yuv2r(y,u,v) (clip((298 * (y)			  + 409 * (v) + 128) >> 8))
+#define yuv2g(y,u,v) (clip((298 * (y) - 100 * (u) - 208 * (v) + 128) >> 8))
+#define yuv2b(y,u,v) (clip((298 * (y) + 516 * (u)			  + 128) >> 8))
+#define yuv10b2r(y,u,v) (clip((298 * (y)			 + 409 * (v) + (128<<2)) >> 10))
+#define yuv10b2g(y,u,v) (clip((298 * (y) - 100 * (u) - 208 * (v) + (128<<2)) >> 10))
+#define yuv10b2b(y,u,v) (clip((298 * (y) + 516 * (u)			 + (128<<2)) >> 10))
+
 void CyuvplayerDlg::yuv2rgb(void)
 {
 
@@ -718,9 +726,9 @@ void CyuvplayerDlg::yuv2rgb(void)
                 d = misc[(j*width+i)*3 + 1] - 128;
                 e = misc[(j*width+i)*3 + 2] - 128;
 
-                (*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-                (*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-                (*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+                (*cur) = yuv2r(c, d, e);cur++;
+                (*cur) = yuv2g(c, d, e);cur++;
+                (*cur) = yuv2b(c, d, e);cur+=2;
             }
             line += t_width<<2;
         }
@@ -733,9 +741,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = u[j*width+i] - 128;
 				e = v[j*width+i] - 128;
 
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -750,9 +758,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = u[j*stride_uv+(i>>1)] - 128;
 				e = v[j*stride_uv+(i>>1)] - 128;
 
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -767,14 +775,14 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = *(t+0) - 128;   // U
 				e = *(t+2) - 128;   // V
 
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 
 				c = *(t+3) - 16;    // Y2
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 
 				t += 4;
 			}
@@ -791,14 +799,14 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = *(t+1) - 128;   // U
 				e = *(t+3) - 128;   // V
 
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 
 				c = *(t+2) - 16;    // Y2
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 
 				t += 4;
 			}
@@ -830,9 +838,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 					e = misc[(j>>1)*width+(i>>1<<1)  ] - 128;
 				}
 
-				(*cur) = clip(( 298 * c           + 409 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + 128) >> 8);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + 128) >> 8);cur+=2;
+				(*cur) = yuv2r(c, d, e);cur++;
+				(*cur) = yuv2g(c, d, e);cur++;
+				(*cur) = yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -860,9 +868,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = d - (128<<2);
 				e = e - (128<<2);
 
-				(*cur) = clip(( 298 * c           + 409 * e + (128<<2)) >> 10);cur++;
-				(*cur) = clip(( 298 * c - 100 * d - 208 * e + (128<<2)) >> 10);cur++;
-				(*cur) = clip(( 298 * c + 516 * d           + (128<<2)) >> 10);cur+=2;
+				(*cur) = yuv10b2r(c, d, e);cur++;
+				(*cur) = yuv10b2g(c, d, e);cur++;
+				(*cur) = yuv10b2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
