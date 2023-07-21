@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by yuvplayer.rc
+// Microsoft Visual C++ 產生的 Include 檔案。
+// 由 yuvplayer.rc 使用
 //
 #define IDD_YUVPLAYER_DIALOG            102
 #define IDR_MENU1                       130
@@ -24,12 +24,10 @@
 #define ID_OPEN                         32774
 #define ID_FILE_EXIT                    32791
 #define ID_FILE_GO                      32792
-
 #define ID_CONTEXTMENU_SAVELUMINANCE    32793
 #define ID_CONTEXTMENU_SAVERGB          32794
 #define ID_CONTEXTMENU_SAVEYUV          32795
 #define ID_CONTEXTMENU_SAVE_LUMINANCE   32796
-
 #define ID_CMENU_SAVE_YUV               32797
 #define ID_CMENU_SAVE_LUMINANCE         32798
 #define ID_CMENU_SAVE_RGB               32799
@@ -39,7 +37,11 @@
 #define ID_CMENU_SAVE_YUV420            32803
 #define ID_CMENU_SAVE_YUV444            32804
 #define ID_FILE_RELOAD                  32822
-
+#define ID_COLORMODE_START              33000
+#define ID_COLORMODE_BT601              33000
+#define ID_COLORMODE_BT709              33001
+#define ID_COLORMODE_BT2020             33002
+#define ID_COLORMODE_END                33002
 #define ID_COLOR_START                  40000
 #define ID_COLOR_YUV420_10LE            40000
 #define ID_COLOR_YUV420_10BE            40001
@@ -56,7 +58,6 @@
 #define ID_COLOR_RGB24                  40012
 #define ID_COLOR_RGB16                  40013
 #define ID_COLOR_END                    40013
-
 #define ID_SIZE_START                   40020
 #define ID_SIZE_HD                      40020
 #define ID_SIZE_SD                      40021
@@ -69,7 +70,6 @@
 #define ID_SIZE_640X360                 40028
 #define ID_SIZE_CUSTOM                  40029
 #define ID_SIZE_END                     40029
-
 #define ID_ZOOM_START                   40040
 #define ID_ZOOM_41                      40040
 #define ID_ZOOM_21                      40041
@@ -77,7 +77,6 @@
 #define ID_ZOOM_12                      40043
 #define ID_ZOOM_14                      40044
 #define ID_ZOOM_END                     40044
-
 #define ID_SEGMENT_START                40060
 #define ID_SEGMENT_64X64                40060
 #define ID_SEGMENT_32X32                40061
@@ -89,7 +88,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32832
+#define _APS_NEXT_COMMAND_VALUE         32838
 #define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

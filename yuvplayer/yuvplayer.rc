@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 한국어(대한민국) resources
+// 질ㅵ (질곌) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
 LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
@@ -224,6 +224,12 @@ BEGIN
         MENUITEM "1:2",                         ID_ZOOM_12
         MENUITEM "1:4",                         ID_ZOOM_14
     END
+    POPUP "Color&Mode"
+    BEGIN
+        MENUITEM "BT.601",                      ID_COLORMODE_BT601, CHECKED
+        MENUITEM "BT.709",                      ID_COLORMODE_BT709
+        MENUITEM "BT.2020",                     ID_COLORMODE_BT2020
+    END
     POPUP "Segment"
     BEGIN
         MENUITEM "64x64 (RED)",                 ID_SEGMENT_64X64
@@ -285,7 +291,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\wi0111-48.ico"
 
-#endif    // 한국어(대한민국) resources
+#endif    // 질ㅵ (질곌) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

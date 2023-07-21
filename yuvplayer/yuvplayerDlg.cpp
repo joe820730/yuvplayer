@@ -116,6 +116,85 @@ static const size_info_t size_info[] = {
 };
 #endif
 
+#define clip(var) (((var)>=255)?255:((var)<=0)?0:(var))
+// BT.601
+uint32_t yuv2r_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 409 * v + 128) >> 8));
+}
+uint32_t yuv2g_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 100 * u - 208 * v + 128) >> 8));
+}
+uint32_t yuv2b_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 516 * u + 128) >> 8));
+}
+uint32_t yuv10b2r_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 409 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2g_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 100 * u - 208 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2b_bt601(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 516 * u + (128 << 2)) >> 10));
+}
+
+// BT.709
+uint32_t yuv2r_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 459 * v + 128) >> 8));
+}
+uint32_t yuv2g_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 55 * u - 137 * v + 128) >> 8));
+}
+uint32_t yuv2b_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 541 * u + 128) >> 8));
+}
+uint32_t yuv10b2r_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 459 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2g_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 55 * u - 137 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2b_bt709(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 541 * u + (128 << 2)) >> 10));
+}
+
+// BT.2020
+uint32_t yuv2r_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 431 * v + 128) >> 8));
+}
+uint32_t yuv2g_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 48 * u - 167 * v + 128) >> 8));
+}
+uint32_t yuv2b_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 550 * u + 128) >> 8));
+}
+uint32_t yuv10b2r_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 431 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2g_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y - 48 * u - 167 * v + (128 << 2)) >> 10));
+}
+uint32_t yuv10b2b_bt2020(int32_t y, int32_t u, int32_t v)
+{
+	return (clip((298 * y + 550 * u + (128 << 2)) >> 10));
+}
+
 // CyuvplayerDlg dialog
 CyuvplayerDlg::CyuvplayerDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CyuvplayerDlg::IDD, pParent)
@@ -124,6 +203,14 @@ CyuvplayerDlg::CyuvplayerDlg(CWnd* pParent /*=NULL*/)
 
 	y = u = v = rgba = misc = segment = NULL;
 	m_color = YUV420;
+
+	m_colormode = BT601;
+	fp_yuv2r = yuv2r_bt601;
+	fp_yuv2g = yuv2g_bt601;
+	fp_yuv2b = yuv2b_bt601;
+	fp_yuv10b2r = yuv10b2r_bt601;
+	fp_yuv10b2g = yuv10b2g_bt601;
+	fp_yuv10b2b = yuv10b2b_bt601;
 
 	fd = -1;
 	ratio = 1.0;
@@ -157,6 +244,7 @@ BEGIN_MESSAGE_MAP(CyuvplayerDlg, CDialog)
 
 	ON_COMMAND_RANGE(ID_SIZE_START,  ID_SIZE_END,  OnSizeChange)
 	ON_COMMAND_RANGE(ID_COLOR_START, ID_COLOR_END, OnColor)
+	ON_COMMAND_RANGE(ID_COLORMODE_START, ID_COLORMODE_END, OnColorMode)
 	ON_COMMAND_RANGE(ID_ZOOM_START,  ID_ZOOM_END,  OnZoom)
 	ON_COMMAND_RANGE(ID_SEGMENT_START, ID_SEGMENT_END, OnSegment)
 
@@ -177,7 +265,6 @@ BEGIN_MESSAGE_MAP(CyuvplayerDlg, CDialog)
 	ON_COMMAND(ID_CMENU_SAVE_YUV420, &CyuvplayerDlg::OnCmenuSaveYuv420)
 	ON_COMMAND(ID_CMENU_SAVE_RGB, &CyuvplayerDlg::OnCmenuSaveRgb)
 END_MESSAGE_MAP()
-
 
 // CyuvplayerDlg message handlers
 
@@ -599,6 +686,59 @@ void CyuvplayerDlg::OnColor(UINT nID )
 
 }
 
+void CyuvplayerDlg::OnColorMode(UINT nID)
+{
+
+	// TODO: Add your command handler code here
+	int i;
+
+	// uncheck all size menu items
+	for (i = ID_COLORMODE_START; i <= ID_COLORMODE_END; i++)
+		menu->CheckMenuItem(i, MF_UNCHECKED);
+
+	switch (nID) {
+	case ID_COLORMODE_BT601:
+		menu->CheckMenuItem(ID_COLORMODE_BT601, MF_CHECKED);
+		m_colormode = BT601;
+		fp_yuv2r = yuv2r_bt601;
+		fp_yuv2g = yuv2g_bt601;
+        fp_yuv2b = yuv2b_bt601;
+		fp_yuv10b2r = yuv10b2r_bt601;
+		fp_yuv10b2g = yuv10b2g_bt601;
+		fp_yuv10b2b = yuv10b2b_bt601;
+		break;
+
+	case ID_COLORMODE_BT709:
+		menu->CheckMenuItem(ID_COLORMODE_BT709, MF_CHECKED);
+		m_colormode = BT709;
+		fp_yuv2r = yuv2r_bt709;
+		fp_yuv2g = yuv2g_bt709;
+		fp_yuv2b = yuv2b_bt709;
+		fp_yuv10b2r = yuv10b2r_bt709;
+		fp_yuv10b2g = yuv10b2g_bt709;
+		fp_yuv10b2b = yuv10b2b_bt709;
+		break;
+
+	case ID_COLORMODE_BT2020:
+		menu->CheckMenuItem(ID_COLORMODE_BT2020, MF_CHECKED);
+		m_colormode = BT2020;
+		fp_yuv2r = yuv2r_bt2020;
+		fp_yuv2g = yuv2g_bt2020;
+		fp_yuv2b = yuv2b_bt2020;
+		fp_yuv10b2r = yuv10b2r_bt2020;
+		fp_yuv10b2g = yuv10b2g_bt2020;
+		fp_yuv10b2b = yuv10b2b_bt2020;
+		break;
+
+	default:
+		menu->CheckMenuItem(ID_COLORMODE_BT601, MF_CHECKED);
+		m_colormode = BT601;
+		break;
+	}
+	UpdateParameter();
+	LoadFrame();
+}
+
 void CyuvplayerDlg::UpdateParameter()
 {
 	__int64 size;
@@ -694,20 +834,11 @@ void CyuvplayerDlg::LoadFrame(void)
 	m_slider.UpdateData(FALSE);
 }
 
-#define clip(var) ((var>=255)?255:(var<=0)?0:var)
-
-#define yuv2r(y,u,v) (clip((298 * (y)			  + 409 * (v) + 128) >> 8))
-#define yuv2g(y,u,v) (clip((298 * (y) - 100 * (u) - 208 * (v) + 128) >> 8))
-#define yuv2b(y,u,v) (clip((298 * (y) + 516 * (u)			  + 128) >> 8))
-#define yuv10b2r(y,u,v) (clip((298 * (y)			 + 409 * (v) + (128<<2)) >> 10))
-#define yuv10b2g(y,u,v) (clip((298 * (y) - 100 * (u) - 208 * (v) + (128<<2)) >> 10))
-#define yuv10b2b(y,u,v) (clip((298 * (y) + 516 * (u)			 + (128<<2)) >> 10))
-
 void CyuvplayerDlg::yuv2rgb(void)
 {
 
 	int j, i;
-	int c, d, e;
+	int32_t c, d, e;
 
 	int stride_uv;
 
@@ -726,9 +857,9 @@ void CyuvplayerDlg::yuv2rgb(void)
                 d = misc[(j*width+i)*3 + 1] - 128;
                 e = misc[(j*width+i)*3 + 2] - 128;
 
-                (*cur) = yuv2r(c, d, e);cur++;
-                (*cur) = yuv2g(c, d, e);cur++;
-                (*cur) = yuv2b(c, d, e);cur+=2;
+                (*cur) = fp_yuv2r(c, d, e);cur++;
+                (*cur) = fp_yuv2g(c, d, e);cur++;
+                (*cur) = fp_yuv2b(c, d, e);cur+=2;
             }
             line += t_width<<2;
         }
@@ -741,9 +872,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = u[j*width+i] - 128;
 				e = v[j*width+i] - 128;
 
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -758,9 +889,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = u[j*stride_uv+(i>>1)] - 128;
 				e = v[j*stride_uv+(i>>1)] - 128;
 
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -775,14 +906,14 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = *(t+0) - 128;   // U
 				e = *(t+2) - 128;   // V
 
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 
 				c = *(t+3) - 16;    // Y2
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 
 				t += 4;
 			}
@@ -799,14 +930,14 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = *(t+1) - 128;   // U
 				e = *(t+3) - 128;   // V
 
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 
 				c = *(t+2) - 16;    // Y2
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 
 				t += 4;
 			}
@@ -838,9 +969,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 					e = misc[(j>>1)*width+(i>>1<<1)  ] - 128;
 				}
 
-				(*cur) = yuv2r(c, d, e);cur++;
-				(*cur) = yuv2g(c, d, e);cur++;
-				(*cur) = yuv2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv2r(c, d, e);cur++;
+				(*cur) = fp_yuv2g(c, d, e);cur++;
+				(*cur) = fp_yuv2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}
@@ -868,9 +999,9 @@ void CyuvplayerDlg::yuv2rgb(void)
 				d = d - (128<<2);
 				e = e - (128<<2);
 
-				(*cur) = yuv10b2r(c, d, e);cur++;
-				(*cur) = yuv10b2g(c, d, e);cur++;
-				(*cur) = yuv10b2b(c, d, e);cur+=2;
+				(*cur) = fp_yuv10b2r(c, d, e);cur++;
+				(*cur) = fp_yuv10b2g(c, d, e);cur++;
+				(*cur) = fp_yuv10b2b(c, d, e);cur+=2;
 			}
 			line += t_width<<2;
 		}

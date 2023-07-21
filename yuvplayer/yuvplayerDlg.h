@@ -49,6 +49,7 @@
 #define MAX_PATH_LEN 1024
 
 enum color_format { YUV420_10BE, YUV420_10LE, YUV444, YUV422, YUV420, UYVY, YUYV, YYY, PACKED_YUV444, NV12, NV21, RGB32, RGB24, RGB16 };
+enum color_mode   { BT601, BT709, BT2020 };
 enum segment_type { SEGMENT16x16 = 1, SEGMENT32x32 = 2, SEGMENT64x64 = 4};
 
 // CyuvplayerDlg dialog
@@ -103,6 +104,7 @@ private:
 	float ratio;
 
 	color_format m_color;
+	color_mode m_colormode;
 	
 	CBitmapButton m_open_btn;
 	CBitmapButton m_rewind_btn;
@@ -128,6 +130,13 @@ private:
 	void rgb2yuv420();
 	void OnCmenuSaveYuv( color_format type );
 
+	uint32_t (*fp_yuv2r)(int32_t, int32_t, int32_t);
+	uint32_t (*fp_yuv2g)(int32_t, int32_t, int32_t);
+	uint32_t (*fp_yuv2b)(int32_t, int32_t, int32_t);
+	uint32_t (*fp_yuv10b2r)(int32_t, int32_t, int32_t);
+	uint32_t (*fp_yuv10b2g)(int32_t, int32_t, int32_t);
+	uint32_t (*fp_yuv10b2b)(int32_t, int32_t, int32_t);
+
 	COpenGLView* OpenGLView;
 
 	BOOL started;
@@ -138,6 +147,7 @@ public:
 	afx_msg void OnFileReload();
 	afx_msg void OnSizeChange(UINT nID );
 	afx_msg void OnColor(UINT nID);
+	afx_msg void OnColorMode(UINT nID);
 	afx_msg void OnZoom(UINT nID);
 	afx_msg void OnSegment(UINT nID );
 
